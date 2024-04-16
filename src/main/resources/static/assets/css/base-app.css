@@ -1,0 +1,19 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+#app {
+	display: flex;
+
+	width: 100vw;
+	height: 100vh;
+
+	gap: 12px;
+	justify-content: center;
+	align-items: center;
+}
+
+.el-tabs__item {
+	font-size: 24px;
+}

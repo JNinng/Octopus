@@ -1,0 +1,12 @@
+!!top.ninng.octopus.entry.Api
+apis:
+  - cache: true
+    param: [ id&22, password&/*41 ]
+    path: /
+    returnParam: [ token&s5d4f ]
+    type: post
+  - cache: true
+    param: [ id&22, password&/*41 ]
+    path: /
+    returnParam: [ token&s5d4f ]
+    type: post

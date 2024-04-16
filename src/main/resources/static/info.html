@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta content="IE=edge" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+		<title>系统信息</title>
+
+		<!-- Import style -->
+		<link href="/assets/css/element-puls.css" rel="stylesheet" />
+		<!-- Import Vue 3 -->
+		<script src="/assets/js/vue.global.js"></script>
+		<!-- Import component library -->
+		<script src="/assets/js/element-plus.js"></script>
+
+		<link href="/assets/css/info.css" rel="stylesheet" />
+		<script src="/assets/js/info.js"></script>
+		<script th:inline="javascript">
+			window.onload = function () {
+			    Object.assign(window, Vue);
+			    const vue3Composition = {
+			        setup() {
+			            // 变量部分
+			            const data = reactive({
+			                drawer: ref(false),
+			                activePageName: ref("info"),
+			                info: ref(JSON.parse([[${info}]])),
+			            });
+			            const dataRef = toRefs(data);
+			            // 生命周期 mounted
+			            // onMounted(() => {
+			            // });
+			            // 函数部分
+			            const methods = reactive({});
+			            return {
+			                ...dataRef,
+			                ...methods,
+			            };
+			        },
+			    };
+			    const app = createApp(vue3Composition).use(ElementPlus).mount("#app"); //初始化
+			};
+		</script>
+	</head>
+	<body>
+		<div id="app">
+			<div class="container">
+				<el-link href="/_" type="primary">&lt;主页</el-link>
+				<el-tabs :stretch="true" class="demo-tabs" stretch="true" v-model="activePageName">
+					<el-tab-pane label="信息" name="info">
+						<el-descriptions :column="2" border class="margin-top" size="default">
+							<el-descriptions-item span="2">
+								<template #label> 缓存类型 </template>
+								{{info.cacheType}}
+							</el-descriptions-item>
+							<el-descriptions-item span="2">
+								<template #label> 数据库 </template>
+								{{info.databaseUrl}}
+							</el-descriptions-item>
+							<el-descriptions-item>
+								<template #label> 数据库用户名 </template>
+								{{info.databaseUserName}}
+							</el-descriptions-item>
+							<el-descriptions-item>
+								<template #label> 数据库密码 </template>
+								{{info.databasePassword}}
+							</el-descriptions-item>
+						</el-descriptions>
+					</el-tab-pane>
+				</el-tabs>
+			</div>
+		</div>
+	</body>
+</html>

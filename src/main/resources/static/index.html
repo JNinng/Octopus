@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta content="IE=edge" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+		<title>主页</title>
+
+		<!-- Import style -->
+		<link rel="stylesheet" href="/assets/css/element-puls.css" />
+		<!-- Import Vue 3 -->
+		<script src="/assets/js/vue.global.js"></script>
+		<!-- Import component library -->
+		<script src="/assets/js/element-plus.js"></script>
+		<script src="/assets/js/info.js"></script>
+		<script>
+			window.onload = function () {
+				Object.assign(window, Vue);
+				const vue3Composition = {
+					setup() {
+						// 变量部分
+						const data = reactive({});
+						const dataRef = toRefs(data);
+						// 函数部分
+						const methods = reactive({});
+						return {
+							...dataRef,
+							...methods,
+						};
+					},
+				};
+				const app = createApp(vue3Composition).use(ElementPlus).mount("#app"); //初始化
+			};
+		</script>
+
+		<link href="/assets/css/index.css" rel="stylesheet" />
+		<script src="/assets/js/index.js"></script>
+	</head>
+	<html>
+		<body>
+			<div id="app">
+				<el-link type="primary" href="/_info">系统信息</el-link>
+				<el-divider direction="vertical"></el-divider>
+				<el-link type="primary" href="/_config">配置 API</el-link>
+			</div>
+		</body>
+	</html>
+</html>

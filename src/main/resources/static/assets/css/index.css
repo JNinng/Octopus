@@ -1,0 +1,7 @@
+@import 'base-app.css';
+
+.el-link {
+	height: 26px;
+
+	font-size: 26px;
+}

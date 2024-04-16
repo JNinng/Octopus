@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta content="IE=edge" http-equiv="X-UA-Compatible" />
+		<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+		<title>配置 API</title>
+
+		<!-- Import style -->
+		<link rel="stylesheet" href="/assets/css/element-puls.css" />
+		<!-- Import Vue 3 -->
+		<script src="/assets/js/vue.global.js"></script>
+		<!-- Import component library -->
+		<script src="/assets/js/element-plus.js"></script>
+		<script src="/assets/js/info.js"></script>
+		<script th:inline="javascript">
+			window.onload = function () {
+				Object.assign(window, Vue);
+				const vue3Composition = {
+					setup() {
+						// 变量部分
+						const data = reactive({
+							drawer: ref(false),
+							// api: ref(JSON.parse([[${api}]]))
+						});
+						const dataRef = toRefs(data);
+						// 函数部分
+						const methods = reactive({
+							click(msg) {
+								console.log(msg);
+							},
+							openDrawer() {
+								dataRef.drawer.value = true;
+							},
+							handleClose() {
+								dataRef.drawer.value = false;
+							},
+						});
+						return {
+							...dataRef,
+							...methods,
+						};
+					},
+				};
+				const app = createApp(vue3Composition).use(ElementPlus).mount("#app"); //初始化
+			};
+		</script>
+	</head>
+	<body>
+		<div id="app">
+			<div class="container">
+				<p>[[${keys}]]</p>
+				<p>[[${values}]]</p>
+				<el-container>
+					<el-header>Header drawer: {{ drawer }}</el-header>
+					<el-main>
+						<el-button @click="openDrawer">弹</el-button>
+						<el-button @click="click('primary')" type="primary">事件</el-button>
+						<el-drawer
+							v-model="drawer"
+							title="I am the title"
+							direction="rtl"
+							:before-close="handleClose"
+						>
+							<span>Hi, there!</span>
+						</el-drawer>
+					</el-main>
+				</el-container>
+			</div>
+		</div>
+	</body>
+</html>
