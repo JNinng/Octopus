@@ -43,8 +43,10 @@ public class AdminController {
     @RequestMapping("/_config")
     public ModelAndView config() {
         ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("urls", apiMappingContainer.getUrls());
         modelAndView.addObject("keys", apiMappingContainer.getApiParamKeyMap());
         modelAndView.addObject("values", apiMappingContainer.getApiParamValueMap());
+        modelAndView.addObject("return_config", apiMappingContainer.getApiMap());
         modelAndView.setViewName("config");
         return modelAndView;
     }
