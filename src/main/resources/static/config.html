@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8" />
 		<meta content="IE=edge" http-equiv="X-UA-Compatible" />
@@ -12,7 +12,9 @@
 		<script src="/assets/js/vue.global.js"></script>
 		<!-- Import component library -->
 		<script src="/assets/js/element-plus.js"></script>
-		<script src="/assets/js/info.js"></script>
+		<script src="/assets/js/qs.js"></script>
+		<script src="/assets/js/axios.js"></script>
+		<link rel="stylesheet" href="./assets/css/config.css" />
 		<script th:inline="javascript">
 			window.onload = function () {
 				Object.assign(window, Vue);
@@ -21,9 +23,24 @@
 						// 变量部分
 						const data = reactive({
 							drawer: ref(false),
-							// api: ref(JSON.parse([[${api}]]))
+			                activePageName: ref("config"),
+							urls: ref([[${urls}]]),
+							keys: ref([[${keys}]]),
+							values: ref([[${values}]]),
+							configKeys: ref(),
+							configValueType: ref(),
+							returnConfig: ref([[${return_config}]]),
 						});
 						const dataRef = toRefs(data);
+						onMounted(() => {
+							// console.log(dataRef.urls.value);
+							// console.log(dataRef.keys.value);
+							// console.log(dataRef.values.value);
+							dataRef.urls.value.forEach(url => {
+								toRaw(dataRef.returnConfig.value[url]).returnKeys = toRaw(dataRef.returnConfig.value[url]).returnKeys.join(",");
+								toRaw(dataRef.returnConfig.value[url]).returnValueTypes = toRaw(dataRef.returnConfig.value[url]).returnValueTypes.join(",");
+							});
+						});
 						// 函数部分
 						const methods = reactive({
 							click(msg) {
@@ -35,6 +52,33 @@
 							handleClose() {
 								dataRef.drawer.value = false;
 							},
+							getKeys(url){
+								return dataRef.keys.value[url]
+							},
+							saveUrlReturnConfig(url){
+								var config = toRaw(dataRef.returnConfig.value[url]);
+								var qs = Qs;
+								axios({
+									method: "post",
+									url:"http://localhost:8080/_save",
+									headers: {  "Content-Type":"application/json;charset=utf-8" },
+									data: {
+										url: url,
+										returnKeys: config.returnKeys.split(","),
+										returnValueTypes: config.returnValueTypes.split(","),
+										returnSum: config.returnSum
+									}
+								}).then(res=>{
+									var type="error";
+									if(res.data=="保存成功"){
+										type="success";
+									}
+									ElementPlus.ElMessage({
+										message: res.data,
+										type: type,
+									})
+								})
+							}
 						});
 						return {
 							...dataRef,
@@ -49,24 +93,68 @@
 	<body>
 		<div id="app">
 			<div class="container">
-				<p>[[${keys}]]</p>
-				<p>[[${values}]]</p>
 				<el-container>
-					<el-header>Header drawer: {{ drawer }}</el-header>
+					<el-header>
+						<el-link href="/_" type="primary">&lt;主页</el-link>
+					</el-header>
 					<el-main>
-						<el-button @click="openDrawer">弹</el-button>
-						<el-button @click="click('primary')" type="primary">事件</el-button>
-						<el-drawer
-							v-model="drawer"
-							title="I am the title"
-							direction="rtl"
-							:before-close="handleClose"
-						>
-							<span>Hi, there!</span>
-						</el-drawer>
+						<el-scrollbar height="100%">
+							<el-tabs :stretch="true" class="demo-tabs" stretch="true" v-model="activePageName">
+								<el-tab-pane label="API 配置" name="config">
+									<h1 v-if="urls.length==0" style="display: block; text-align: center">请先访问接口</h1>
+									<el-descriptions
+										style="margin-bottom: 10px"
+										direction="vertical"
+										:column="4"
+										border
+										v-for="url,index in urls"
+										:key="index"
+									>
+										<el-descriptions-item label="API" :span="4">{{url}}</el-descriptions-item>
+										<el-descriptions-item
+											v-for="k,i in getKeys(url)"
+											:key="i"
+											:label="k"
+											:span="(i==(getKeys(url).length-1)?4:1)"
+											>{{values[url][i]}}</el-descriptions-item
+										>
+										<el-descriptions-item label="Return" :span="8">
+											<div>
+												<el-input
+													v-model="returnConfig[url].returnKeys"
+													placeholder="键列表：name,password,captcha,permission"
+												/>
+											</div>
+											<div>
+												<el-input
+													v-model="returnConfig[url].returnValueTypes"
+													placeholder="值列表（&：数组类型）：string,string,string,string&4"
+												/>
+											</div>
+											<div>
+												<el-input v-model="returnConfig[url].returnSum" placeholder="数量" />
+											</div>
+											<el-button
+												@click="saveUrlReturnConfig(url)"
+												type="success"
+												style="margin-top: 2px"
+												>保存</el-button
+											>
+										</el-descriptions-item>
+									</el-descriptions>
+								</el-tab-pane>
+								<el-tab-pane label="其他" name="other">
+									<el-button @click="openDrawer">弹</el-button>
+									<el-button @click="click('primary')" type="primary">事件</el-button>
+								</el-tab-pane>
+							</el-tabs>
+						</el-scrollbar>
 					</el-main>
 				</el-container>
 			</div>
+			<el-drawer v-model="drawer" title="I am the title" direction="rtl" :before-close="handleClose">
+				<span>Hi, there!</span>
+			</el-drawer>
 		</div>
 	</body>
 </html>

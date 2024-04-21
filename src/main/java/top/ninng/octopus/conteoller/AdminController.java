@@ -18,10 +18,16 @@ package top.ninng.octopus.conteoller;
 
 import com.alibaba.fastjson2.JSON;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import top.ninng.octopus.entry.Api;
 import top.ninng.octopus.service.AdminService;
-import top.ninng.octopus.storage.ApiMappingContainer;
+import top.ninng.octopus.storage.ApiContainer;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 管理控制器
@@ -33,18 +39,20 @@ import top.ninng.octopus.storage.ApiMappingContainer;
 public class AdminController {
 
     private AdminService adminService;
-    private ApiMappingContainer apiMappingContainer;
+    private ApiContainer apiContainer;
 
-    public AdminController(AdminService adminService, ApiMappingContainer apiMappingContainer) {
+    public AdminController(AdminService adminService, ApiContainer apiContainer) {
         this.adminService = adminService;
-        this.apiMappingContainer = apiMappingContainer;
+        this.apiContainer = apiContainer;
     }
 
     @RequestMapping("/_config")
     public ModelAndView config() {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("keys", apiMappingContainer.getApiParamKeyMap());
-        modelAndView.addObject("values", apiMappingContainer.getApiParamValueMap());
+        modelAndView.addObject("urls", apiContainer.getUrls());
+        modelAndView.addObject("keys", apiContainer.getApiParamKeyMap());
+        modelAndView.addObject("values", apiContainer.getApiParamValueMap());
+        modelAndView.addObject("return_config", apiContainer.getApiMap());
         modelAndView.setViewName("config");
         return modelAndView;
     }
@@ -62,5 +70,14 @@ public class AdminController {
         modelAndView.addObject("info", JSON.toJSONString(adminService.info()));
         modelAndView.setViewName("info");
         return modelAndView;
+    }
+
+    @PostMapping(path = "/_save")
+    @ResponseBody
+    public String saveApiConfig(HttpServletRequest request, @RequestBody Api api) {
+        if (!apiContainer.updateApiReturnConfig(api)) {
+            return apiContainer.getError();
+        }
+        return "保存成功";
     }
 }
