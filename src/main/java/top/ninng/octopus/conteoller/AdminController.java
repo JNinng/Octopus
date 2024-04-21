@@ -18,10 +18,16 @@ package top.ninng.octopus.conteoller;
 
 import com.alibaba.fastjson2.JSON;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import top.ninng.octopus.entry.Api;
 import top.ninng.octopus.service.AdminService;
 import top.ninng.octopus.storage.ApiMappingContainer;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 管理控制器
@@ -64,5 +70,14 @@ public class AdminController {
         modelAndView.addObject("info", JSON.toJSONString(adminService.info()));
         modelAndView.setViewName("info");
         return modelAndView;
+    }
+
+    @PostMapping(path = "/_save")
+    @ResponseBody
+    public String saveApiConfig(HttpServletRequest request, @RequestBody Api api) {
+        if (!apiMappingContainer.updateApiReturnConfig(api)) {
+            return apiMappingContainer.getError();
+        }
+        return "保存成功";
     }
 }

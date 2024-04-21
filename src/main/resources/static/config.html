@@ -12,6 +12,8 @@
 		<script src="/assets/js/vue.global.js"></script>
 		<!-- Import component library -->
 		<script src="/assets/js/element-plus.js"></script>
+		<script src="/assets/js/qs.js"></script>
+		<script src="/assets/js/axios.js"></script>
 		<link rel="stylesheet" href="./assets/css/config.css" />
 		<script th:inline="javascript">
 			window.onload = function () {
@@ -31,9 +33,13 @@
 						});
 						const dataRef = toRefs(data);
 						onMounted(() => {
-							console.log(dataRef.urls.value);
-							console.log(dataRef.keys.value);
-							console.log(dataRef.values.value);
+							// console.log(dataRef.urls.value);
+							// console.log(dataRef.keys.value);
+							// console.log(dataRef.values.value);
+							dataRef.urls.value.forEach(url => {
+								toRaw(dataRef.returnConfig.value[url]).returnKeys = toRaw(dataRef.returnConfig.value[url]).returnKeys.join(",");
+								toRaw(dataRef.returnConfig.value[url]).returnValueTypes = toRaw(dataRef.returnConfig.value[url]).returnValueTypes.join(",");
+							});
 						});
 						// 函数部分
 						const methods = reactive({
@@ -50,8 +56,28 @@
 								return dataRef.keys.value[url]
 							},
 							saveUrlReturnConfig(url){
-								console.log("saveReturnConfig: "+url);
-								console.log(dataRef.returnConfig.value);
+								var config = toRaw(dataRef.returnConfig.value[url]);
+								var qs = Qs;
+								axios({
+									method: "post",
+									url:"http://localhost:8080/_save",
+									headers: {  "Content-Type":"application/json;charset=utf-8" },
+									data: {
+										url: url,
+										returnKeys: config.returnKeys.split(","),
+										returnValueTypes: config.returnValueTypes.split(","),
+										returnSum: config.returnSum
+									}
+								}).then(res=>{
+									var type="error";
+									if(res.data=="保存成功"){
+										type="success";
+									}
+									ElementPlus.ElMessage({
+										message: res.data,
+										type: type,
+									})
+								})
 							}
 						});
 						return {
@@ -95,18 +121,18 @@
 										<el-descriptions-item label="Return" :span="8">
 											<div>
 												<el-input
-													v-model="returnConfig[url].keys"
+													v-model="returnConfig[url].returnKeys"
 													placeholder="键列表：name,password,captcha,permission"
 												/>
 											</div>
 											<div>
 												<el-input
-													v-model="returnConfig[url].valueType"
+													v-model="returnConfig[url].returnValueTypes"
 													placeholder="值列表（&：数组类型）：string,string,string,string&4"
 												/>
 											</div>
 											<div>
-												<el-input v-model="returnConfig[url].sum" placeholder="数量" />
+												<el-input v-model="returnConfig[url].returnSum" placeholder="数量" />
 											</div>
 											<el-button
 												@click="saveUrlReturnConfig(url)"
