@@ -1,11 +1,9 @@
 package top.ninng.octopus.entry;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * API 键值信息和返回数据配置
@@ -20,26 +18,25 @@ public class Api implements Serializable {
     /**
      * 返回 键 列表
      */
-    public List<String> returnKeys = new ArrayList<>();
+    public ArrayList<String> returnKeys = new ArrayList<>();
     /**
      * 返回 值类型 列表
      */
-    public List<String> returnValueTypes = new ArrayList<>();
+    public ArrayList<String> returnValueTypes = new ArrayList<>();
     /**
      * 值为 1 时，返回非数组对象
      */
-    @JSONField(name = "returnSum")
     public int returnSum = 1;
     /**
      * 请求 键 列
      */
-    public List<String> requestKeys = new ArrayList<>();
+    public ArrayList<String> requestKeys = new ArrayList<>();
     /**
      * 请求 值类型 列表：string,int,float,token
      * <p>
      * string&4: 字符串数值，长度为 4
      */
-    public List<String> requestValueTypes = new ArrayList<>();
+    public ArrayList<String> requestValueTypes = new ArrayList<>();
     private ArrayList<String> types;
 
     public Api() {
@@ -64,27 +61,27 @@ public class Api implements Serializable {
                 '}';
     }
 
-    public List<String> getRequestKeys() {
+    public ArrayList<String> getRequestKeys() {
         return requestKeys;
     }
 
-    public void setRequestKeys(List<String> requestKeys) {
+    public void setRequestKeys(ArrayList<String> requestKeys) {
         this.requestKeys = requestKeys;
     }
 
-    public List<String> getRequestValueTypes() {
+    public ArrayList<String> getRequestValueTypes() {
         return requestValueTypes;
     }
 
-    public void setRequestValueTypes(List<String> requestValueTypes) {
+    public void setRequestValueTypes(ArrayList<String> requestValueTypes) {
         this.requestValueTypes = requestValueTypes;
     }
 
-    public List<String> getReturnKeys() {
+    public ArrayList<String> getReturnKeys() {
         return returnKeys;
     }
 
-    public void setReturnKeys(List<String> returnKeys) {
+    public void setReturnKeys(ArrayList<String> returnKeys) {
         this.returnKeys = returnKeys;
     }
 
@@ -96,11 +93,11 @@ public class Api implements Serializable {
         this.returnSum = returnSum;
     }
 
-    public List<String> getReturnValueTypes() {
+    public ArrayList<String> getReturnValueTypes() {
         return returnValueTypes;
     }
 
-    public void setReturnValueTypes(List<String> returnValueTypes) {
+    public void setReturnValueTypes(ArrayList<String> returnValueTypes) {
         this.returnValueTypes = returnValueTypes;
     }
 

@@ -1,7 +1,7 @@
 package top.ninng.octopus.service;
 
 import org.springframework.stereotype.Service;
-import top.ninng.octopus.storage.ApiMappingContainer;
+import top.ninng.octopus.storage.ApiContainer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ import java.util.UUID;
 public class ApiService {
 
     private int index = 0;
-    private ApiMappingContainer apiMappingContainer;
+    private ApiContainer apiContainer;
 
-    public ApiService(ApiMappingContainer apiMappingContainer) {
-        this.apiMappingContainer = apiMappingContainer;
+    public ApiService(ApiContainer apiContainer) {
+        this.apiContainer = apiContainer;
     }
 
     private String getTypeData(String type) {
@@ -44,7 +44,7 @@ public class ApiService {
      * @param request
      * @return
      */
-    public String post(HttpServletRequest request) {
+    public Object post(HttpServletRequest request) {
         String requestURL = String.valueOf(request.getRequestURL());
         Enumeration<String> parameterNames = request.getParameterNames();
 
@@ -57,8 +57,9 @@ public class ApiService {
             paramsKey.add(name);
             paramsValue.add(value);
         }
-        apiMappingContainer.put(requestURL, paramsKey, paramsValue);
-
-        return "ok post";
+        if (!apiContainer.containsUrl(requestURL)) {
+            apiContainer.put(requestURL, paramsKey, paramsValue);
+        }
+        return apiContainer.getReturn(requestURL);
     }
 }

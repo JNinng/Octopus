@@ -38,7 +38,7 @@ public class ApiController {
     }
 
     @RequestMapping(path = "/**", method = RequestMethod.POST)
-    public String post(HttpServletRequest request) {
+    public Object post(HttpServletRequest request) {
         System.out.println("post: " + request.getRequestURL());
         return apiService.post(request);
     }

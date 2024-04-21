@@ -6,6 +6,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 import top.ninng.octopus.entry.Api;
+import top.ninng.octopus.entry.ApiReturnHandler;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
  * @Version 1.0
  */
 @Component
-public class ApiMappingContainer {
+public class ApiContainer {
 
     private static File configFile = new File(System.getProperty("user.dir") + File.separator + "config.yaml");
 
@@ -33,6 +34,7 @@ public class ApiMappingContainer {
      * Map<url,api>
      */
     private Map<String, Api> apiMap = new ConcurrentHashMap<>();
+    private Map<String, ApiReturnHandler> apiReturnHandlerMap = new ConcurrentHashMap<>();
     private String error = "";
 
     private boolean checkReturn(Api api) {
@@ -62,12 +64,16 @@ public class ApiMappingContainer {
         return isLegal;
     }
 
+    public boolean containsUrl(String url) {
+        return apiMap.containsKey(url);
+    }
+
     public Map<String, Api> getApiMap() {
         return apiMap;
     }
 
-    public Map<String, List<String>> getApiParamKeyMap() {
-        Map<String, List<String>> apiParamKeyMap = new HashMap<>();
+    public Map<String, ArrayList<String>> getApiParamKeyMap() {
+        Map<String, ArrayList<String>> apiParamKeyMap = new HashMap<>();
         apiMap.forEach((s, api) -> apiParamKeyMap.put(s, api.requestKeys));
         return apiParamKeyMap;
     }
@@ -102,10 +108,16 @@ public class ApiMappingContainer {
             apiMap = yaml.load(new FileInputStream(configFile));
             if (apiMap == null) {
                 apiMap = new ConcurrentHashMap<>();
+            } else {
+                updateHandler();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public Object getReturn(String url) {
+        return apiReturnHandlerMap.get(url).handle();
     }
 
     public ArrayList<String> getUrls() {
@@ -114,6 +126,7 @@ public class ApiMappingContainer {
 
     public void put(String url, ArrayList<String> paramsKey, ArrayList<String> paramsValue) {
         apiMap.put(url, new Api(paramsKey, paramsValue));
+        updateHandler();
         saveToFile();
     }
 
@@ -144,8 +157,8 @@ public class ApiMappingContainer {
      */
     public boolean updateApiReturnConfig(Api updateApi) {
         // 移除空配置
-        updateApi.setReturnKeys(updateApi.getReturnKeys().stream().filter(s -> !s.equals("")).collect(Collectors.toList()));
-        updateApi.setReturnValueTypes(updateApi.getReturnValueTypes().stream().filter(s -> !s.equals("")).collect(Collectors.toList()));
+        updateApi.setReturnKeys(updateApi.getReturnKeys().stream().filter(s -> !s.equals("")).collect(Collectors.toCollection(ArrayList::new)));
+        updateApi.setReturnValueTypes(updateApi.getReturnValueTypes().stream().filter(s -> !s.equals("")).collect(Collectors.toCollection(ArrayList::new)));
         // 校验返回配置
         if (!checkReturn(updateApi)) {
             return false;
@@ -156,7 +169,14 @@ public class ApiMappingContainer {
             api.setReturnValueTypes(updateApi.getReturnValueTypes());
             return api;
         });
+        updateHandler();
         saveToFile();
         return true;
+    }
+
+    public void updateHandler() {
+        for (String url : apiMap.keySet()) {
+            apiReturnHandlerMap.put(url, new ApiReturnHandler().pretreatment(apiMap.get(url)));
+        }
     }
 }
