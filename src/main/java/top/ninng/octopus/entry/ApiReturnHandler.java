@@ -1,6 +1,6 @@
 package top.ninng.octopus.entry;
 
-import top.ninng.octopus.utils.ReflectUtil;
+import top.ninng.octopus.utils.DynamicClassUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -72,7 +72,7 @@ public class ApiReturnHandler {
             properties.put(key, getValue(key, returnValueTypes.get(i), returnValuesLength.get(i)));
         }
         if (sum == 1) {
-            return ReflectUtil.getTarget(new ReflectUtil.EntityClass(), properties);
+            return DynamicClassUtil.getTarget(new DynamicClassUtil.EntityClass(), properties);
         }
         ArrayList<Object> objects = new ArrayList<>();
         for (int i = 0; i < sum; i++) {
@@ -80,7 +80,7 @@ public class ApiReturnHandler {
                 String key = returnKeys.get(j);
                 properties.put(key, getValue(key, returnValueTypes.get(j), returnValuesLength.get(j)));
             }
-            objects.add(ReflectUtil.getTarget(new ReflectUtil.EntityClass(), properties));
+            objects.add(DynamicClassUtil.getTarget(new DynamicClassUtil.EntityClass(), properties));
         }
         return objects;
     }
