@@ -102,46 +102,58 @@
 							<el-tabs :stretch="true" class="demo-tabs" stretch="true" v-model="activePageName">
 								<el-tab-pane label="API 配置" name="config">
 									<h1 v-if="urls.length==0" style="display: block; text-align: center">请先访问接口</h1>
-									<el-descriptions
-										style="margin-bottom: 10px"
-										direction="vertical"
-										:column="4"
-										border
-										v-for="url,index in urls"
-										:key="index"
-									>
-										<el-descriptions-item label="API" :span="4">{{url}}</el-descriptions-item>
-										<el-descriptions-item
-											v-for="k,i in getKeys(url)"
-											:key="i"
-											:label="k"
-											:span="(i==(getKeys(url).length-1)?4:1)"
-											>{{values[url][i]}}</el-descriptions-item
-										>
-										<el-descriptions-item label="Return" :span="8">
-											<div>
-												<el-input
-													v-model="returnConfig[url].returnKeys"
-													placeholder="键列表：name,password,captcha,permission"
-												/>
-											</div>
-											<div>
-												<el-input
-													v-model="returnConfig[url].returnValueTypes"
-													placeholder="值列表（&：数组类型）：string,string,string,string&4"
-												/>
-											</div>
-											<div>
-												<el-input v-model="returnConfig[url].returnSum" placeholder="数量" />
-											</div>
-											<el-button
-												@click="saveUrlReturnConfig(url)"
-												type="success"
-												style="margin-top: 2px"
-												>保存</el-button
-											>
-										</el-descriptions-item>
-									</el-descriptions>
+									<el-table :data="urls" :border="parentBorder" style="width: 100%">
+										<el-table-column type="expand">
+											<template #default="scope">
+												<div m="4">
+													<el-descriptions
+														style="margin-bottom: 10px"
+														direction="vertical"
+														:column="4"
+														border
+													>
+														<el-descriptions-item
+															v-for="k,i in getKeys(scope.row)"
+															:key="i"
+															:label="k"
+															:span="(i==(getKeys(scope.row).length-1)?4:1)"
+															>{{values[scope.row][i]}}</el-descriptions-item
+														>
+														<el-descriptions-item label="Return" :span="8">
+															<div>
+																<el-input
+																	v-model="returnConfig[scope.row].returnKeys"
+																	placeholder="键列表：name,password,captcha,permission"
+																/>
+															</div>
+															<div>
+																<el-input
+																	v-model="returnConfig[scope.row].returnValueTypes"
+																	placeholder="值列表（&：数组类型）：string,string,string,string&4"
+																/>
+															</div>
+															<div>
+																<el-input
+																	v-model="returnConfig[scope.row].returnSum"
+																	placeholder="数量"
+																/>
+															</div>
+															<el-button
+																@click="saveUrlReturnConfig(scope.row)"
+																type="success"
+																style="margin-top: 2px"
+																>保存</el-button
+															>
+														</el-descriptions-item>
+													</el-descriptions>
+												</div>
+											</template>
+										</el-table-column>
+										<el-table-column label="URL">
+											<template #default="scope"> {{scope.row}} </template>
+										</el-table-column>
+										<!-- <el-table-column label="Name" prop="name" /> -->
+									</el-table>
 								</el-tab-pane>
 								<el-tab-pane label="其他" name="other">
 									<el-button @click="openDrawer">弹</el-button>
