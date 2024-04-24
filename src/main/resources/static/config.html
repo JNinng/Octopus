@@ -8,12 +8,14 @@
 
 		<!-- Import style -->
 		<link rel="stylesheet" href="/assets/css/element-puls.css" />
+		<link rel="stylesheet" href="/assets/css/json-view.css" />
 		<!-- Import Vue 3 -->
 		<script src="/assets/js/vue.global.js"></script>
 		<!-- Import component library -->
 		<script src="/assets/js/element-plus.js"></script>
 		<script src="/assets/js/qs.js"></script>
 		<script src="/assets/js/axios.js"></script>
+		<script src="/assets/js/json-view.js"></script>
 		<link rel="stylesheet" href="./assets/css/config.css" />
 		<script th:inline="javascript">
 			window.onload = function () {
@@ -78,6 +80,20 @@
 										type: type,
 									})
 								})
+							},
+							testUrlReturnConfig(url){
+								var qs = Qs;
+								axios({
+									method: "post",
+									url:url,
+									headers: {  "Content-Type":"application/json;charset=utf-8" },
+								}).then(res=>{
+									console.log(res.data);
+									ElementPlus.ElMessageBox({
+										title: url,
+										message: h("textarea",{style: "width: 400px;height: 180px"},JSON.stringify(res.data,null,4)),
+									})
+								})
 							}
 						});
 						return {
@@ -105,7 +121,7 @@
 									<el-table :data="urls" :border="parentBorder" style="width: 100%">
 										<el-table-column type="expand">
 											<template #default="scope">
-												<div m="4">
+												<div>
 													<el-descriptions
 														style="margin-bottom: 10px"
 														direction="vertical"
@@ -144,6 +160,13 @@
 																style="margin-top: 2px"
 																>保存</el-button
 															>
+															<el-button
+																@click="testUrlReturnConfig(scope.row)"
+																type="info"
+																style="margin-top: 2px"
+																>测试</el-button
+															>
+															<pre id="json-renderer"></pre>
 														</el-descriptions-item>
 													</el-descriptions>
 												</div>
